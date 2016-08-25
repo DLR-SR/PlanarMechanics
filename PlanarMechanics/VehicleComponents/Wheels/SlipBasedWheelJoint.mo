@@ -1,6 +1,8 @@
 within PlanarMechanics.VehicleComponents.Wheels;
 model SlipBasedWheelJoint "Slip-Friction based wheel joint"
-
+  extends
+    Modelica.Thermal.HeatTransfer.Interfaces.PartialElementaryConditionalHeatPort(
+     final T=293.15);
   Interfaces.Frame_a frame_a annotation (Placement(transformation(extent={{-56,-16},
             {-24,16}})));
   Modelica.Mechanics.Rotational.Interfaces.Flange_a flange_a annotation (
@@ -64,7 +66,7 @@ model SlipBasedWheelJoint "Slip-Friction based wheel joint"
       tab="Animation",
       group="if animation = true",
       enable=animate));
-  input Modelica.Mechanics.MultiBody.Types.SpecularCoefficient
+  input PlanarMechanics.Types.SpecularCoefficient
     specularCoefficient = planarWorld.defaultSpecularCoefficient
     "Reflection of ambient light (= 0: light is completely absorbed)"
     annotation (Dialog(tab="Animation", group="if animation = true", enable=animate));
@@ -133,6 +135,7 @@ equation
   f_lat  =f*v_slip_lat/v_slip;
   f_long = {frame_a.fx, frame_a.fy}*e0;
   f_lat = {frame_a.fy, -frame_a.fx}*e0;
+  lossPower = f*v_slip;
   annotation (Icon(graphics={
         Rectangle(
           extent={{-40,100},{40,-100}},
@@ -176,7 +179,13 @@ equation
         Text(
           extent={{-150,140},{150,100}},
           textString="%name",
-          lineColor={0,0,255})}),   Documentation(info="<html>
+          lineColor={0,0,255}),
+        Line(
+          visible=useHeatPort,
+          points={{-100,-100},{-100,-90},{-30,-90}},
+          color={191,0,0},
+          pattern=LinePattern.Dot,
+          smooth=Smooth.None)}),   Documentation(info="<html>
 <p>The ideal wheel joint models the behavior of a wheel rolling on a x,y-plane whose contact patch has slip-dependent friction characteristics. This is an approximation for wheels with a rim and a rupper tire.</p>
 <p>The force depends with friction characteristics on the <b>slip</b>. The <b>slip</b> is split into two components:</p>
 <ul>
@@ -187,7 +196,7 @@ equation
 <p>The radius of the wheel can be specified by the parameter <b>radius</b>. The driving direction (for phi=0) can be specified by the parameter <b>r</b>. The normal load is set by <b>N</b>.</p>
 <p>The wheel contains a 2D connector <b>frame_a</b> for the steering on the plane. The rolling motion of the wheel can be actuated by the 1D  connector <b>flange_a</b>.</p>
 <p>In addition there is an input for a dynamic component of the normal load.</p>
-<p>For examples of usage see the local Examples package.</p>
+<p>For examples of usage see the local <a href=\"modelica://PlanarMechanics.VehicleComponents.Examples\">Examples package</a>.</p>
 </html>", revisions="<html>
 <p><img src=\"modelica://PlanarMechanics/Resources/Images/dlr_logo.png\"/> <b>Developed 2010-2014 at the DLR Institute of System Dynamics and Control</b></p>
 </html>"));

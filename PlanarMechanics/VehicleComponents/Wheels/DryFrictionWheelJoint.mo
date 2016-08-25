@@ -1,6 +1,8 @@
 within PlanarMechanics.VehicleComponents.Wheels;
 model DryFrictionWheelJoint "Dry-Friction based wheel joint"
-
+  extends
+    Modelica.Thermal.HeatTransfer.Interfaces.PartialElementaryConditionalHeatPort(
+     final T=293.15);
   Interfaces.Frame_a frame_a annotation (Placement(transformation(extent={{-56,-16},
             {-24,16}})));
   Modelica.Mechanics.Rotational.Interfaces.Flange_a flange_a annotation (
@@ -19,45 +21,43 @@ model DryFrictionWheelJoint "Dry-Friction based wheel joint"
   parameter Real mu_S "Friction coefficient at sliding";
   final parameter SI.Length l = sqrt(r*r) "Length of vector r";
   final parameter Real e[2] =  r/l "Normalized direction";
-  Real e0[2] "normalized direction w.r.t inertial system";
+  Real e0[2] "Normalized direction w.r.t inertial system";
   Real R[2,2] "Rotation Matrix";
-  SI.Angle phi_roll(stateSelect=stateSelect, start=0) "roll angle of the wheel"
-                                                                                 annotation(Dialog(group="Initialization", showStartAttribute=true));
+  SI.Angle phi_roll(stateSelect=stateSelect, start=0) "Roll angle of the wheel"
+    annotation(Dialog(group="Initialization", showStartAttribute=true));
   SI.AngularVelocity w_roll(final stateSelect=stateSelect, start=0)
-    "roll velocity of wheel" annotation(Dialog(group="Initialization", showStartAttribute=true));
-  SI.Velocity v[2] "velocity";
-  SI.Velocity v_lat(start=0) "driving in lateral direction"
-                                   annotation(Dialog(group="Initialization", showStartAttribute=true));
-  SI.Velocity v_long(start=0) "velocity in longitudinal direction"
-                                         annotation(Dialog(group="Initialization", showStartAttribute=true));
-  SI.Velocity v_slip_long(start=0) "slip velocity in longitudinal direction"
-                                              annotation(Dialog(group="Initialization", showStartAttribute=true));
-  SI.Velocity v_slip_lat( start=0) "slip velocity in lateral direction"
-                                         annotation(Dialog(group="Initialization", showStartAttribute=true));
-  SI.Velocity v_slip "slip velocity";
-  SI.Force f "longitudinal force";
-  SI.Force f_lat "longitudinal force";
-  SI.Force f_long "longitudinal force";
+    "Roll velocity of wheel" annotation(Dialog(group="Initialization", showStartAttribute=true));
+  SI.Velocity v[2] "Velocity";
+  SI.Velocity v_lat(start=0) "Driving in lateral direction"
+    annotation(Dialog(group="Initialization", showStartAttribute=true));
+  SI.Velocity v_long(start=0) "Velocity in longitudinal direction"
+    annotation(Dialog(group="Initialization", showStartAttribute=true));
+  SI.Velocity v_slip_long(start=0) "Slip velocity in longitudinal direction"
+    annotation(Dialog(group="Initialization", showStartAttribute=true));
+  SI.Velocity v_slip_lat( start=0) "Slip velocity in lateral direction"
+    annotation(Dialog(group="Initialization", showStartAttribute=true));
+  SI.Velocity v_slip "Slip velocity";
+  SI.Force f "Longitudinal force";
+  SI.Force f_lat "Longitudinal force";
+  SI.Force f_long "Longitudinal force";
   parameter Boolean animate = true "= true, if animation shall be enabled"
-                                           annotation(Dialog(group="Animation"));
-  parameter Boolean SimVis = false "Perform animation with SimVis" annotation(Dialog(group="Animation"));
-
+     annotation(Dialog(group="Animation"));
   parameter SI.Length zPosition = planarWorld.defaultZPosition
     "Position z of the body" annotation (Dialog(
       tab="Animation",
       group="if animation = true",
       enable=animate));
   parameter SI.Length diameter = 0.1 "Diameter of the rims"
-                           annotation (Dialog(
+    annotation (Dialog(
       tab="Animation",
       group="if animation = true",
       enable=animate));
   parameter SI.Length width = diameter * 0.6 "Width of the wheel"
-                         annotation (Dialog(
+    annotation (Dialog(
       tab="Animation",
       group="if animation = true",
       enable=animate));
-  input Modelica.Mechanics.MultiBody.Types.SpecularCoefficient
+  input PlanarMechanics.Types.SpecularCoefficient
     specularCoefficient = planarWorld.defaultSpecularCoefficient
     "Reflection of ambient light (= 0: light is completely absorbed)"
     annotation (Dialog(tab="Animation", group="if animation = true", enable=animate));
@@ -122,6 +122,7 @@ equation
   f_lat  =f*v_slip_lat/v_slip;
   f_long = {frame_a.fx, frame_a.fy}*e0;
   f_lat = {frame_a.fy, -frame_a.fx}*e0;
+  lossPower = f*v_slip;
   annotation (Icon(graphics={
         Rectangle(
           extent={{-40,100},{40,-100}},
@@ -165,7 +166,13 @@ equation
         Text(
           extent={{-150,140},{150,100}},
           textString="%name",
-          lineColor={0,0,255})}),   Documentation(info="<html>
+          lineColor={0,0,255}),
+        Line(
+          visible=useHeatPort,
+          points={{-100,-100},{-100,-90},{0,-90}},
+          color={191,0,0},
+          pattern=LinePattern.Dot,
+          smooth=Smooth.None)}),    Documentation(info="<html>
 <p>The ideal wheel joint models the behavior of a wheel rolling on a x,y-plane whose contact patch has dry-friction characteristics. This is an approximation for stiff wheels without a tire.</p>
 <p>The force depends with dry-friction characteristics on the slip velocity. The slip velocity is split into two components:</p>
 <ul>
@@ -174,7 +181,7 @@ equation
 </ul>
 <p>The radius of the wheel can be specified by the parameter <b>radius</b>. The driving direction (for phi=0) can be specified by the parameter <b>r</b>. The normal load is set by <b>N</b>.</p>
 <p>The wheel contains a 2D connector <b>frame_a</b> for the steering on the plane. The rolling motion of the wheel can be actuated by the 1D  connector <b>flange_a</b>.</p>
-<p>For examples of usage see the local Examples package.</p>
+<p>For examples of usage see the local <a href=\"modelica://PlanarMechanics.VehicleComponents.Examples\">Examples package</a>.</p>
 </html>", revisions="<html>
 <p><img src=\"modelica://PlanarMechanics/Resources/Images/dlr_logo.png\"/> <b>Developed 2010-2014 at the DLR Institute of System Dynamics and Control</b></p>
 </html>"));

@@ -1,7 +1,9 @@
 within PlanarMechanics.Parts;
 model Damper "Linear (velocity dependent) damper"
-  extends PlanarMechanics.Interfaces.PartialTwoFrames;
-
+  extends BaseClasses.TwoConnectorShapes;
+  extends
+    Modelica.Thermal.HeatTransfer.Interfaces.PartialElementaryConditionalHeatPort(
+     final T=293.15);
   parameter StateSelect stateSelect=StateSelect.default
     "Priority to use phi and w as states" annotation(HideResult=true,Dialog(tab="Advanced"));
   parameter SI.TranslationalDampingConstant d=1 "Damping constant";
@@ -19,33 +21,26 @@ model Damper "Linear (velocity dependent) damper"
     "Cause an assert when the distance between frame_a and frame_b < s_small" annotation (Dialog(
       tab="Advanced"));
 
-  parameter SI.Length zPosition = planarWorld.defaultZPosition
-    "Position z of cylinder representing the fixed translation" annotation (Dialog(
-      tab="Animation", group="if animation = true", enable=animate));
+  //Visualization
   parameter SI.Length length_a = planarWorld.defaultForceLength
     "Length of cylinder at frame_a side"
-    annotation (Dialog(tab="Animation", group="if animation = true", enable=animate));
+    annotation (Dialog(tab="Animation", group="Damper cylinders (if animation = true)", enable=animate));
   input SI.Diameter diameter_a = planarWorld.defaultForceWidth
     "Diameter of cylinder at frame_a side"
-    annotation (Dialog(tab="Animation", group="if animation = true", enable=animate));
+    annotation (Dialog(tab="Animation", group="Damper cylinders (if animation = true)", enable=animate));
   input SI.Diameter diameter_b = 0.6*diameter_a
     "Diameter of cylinder at frame_b side"
-    annotation (Dialog(tab="Animation", group="if animation = true", enable=animate));
-  input Types.Color color_a = {100,100,100} "Color at frame_a"
-    annotation (Dialog(tab="Animation", group="if animation = true", enable=animate, colorSelector));
-  input Types.Color color_b = {155,155,155} "Color at frame_b"
-    annotation (Dialog(tab="Animation", group="if animation = true", enable=animate, colorSelector));
-  input Modelica.Mechanics.MultiBody.Types.SpecularCoefficient specularCoefficient = planarWorld.defaultSpecularCoefficient
-    "Reflection of ambient light (= 0: light is completely absorbed)"
-    annotation (Dialog(tab="Animation", group="if animation = true", enable=animate));
+    annotation (Dialog(tab="Animation", group="Damper cylinders (if animation = true)", enable=animate));
+  input Types.Color color_a = {0,127,255} "Color of cylinder at frame_a side"
+    annotation (HideResult=true, Dialog(tab="Animation", group="Damper cylinders (if animation = true)", enable=animate, colorSelector=true));
+  input Types.Color color_b = {0,64,200} "Color of cylinder at frame_b side"
+    annotation (HideResult=true, Dialog(tab="Animation", group="Damper cylinders (if animation = true)", enable=animate, colorSelector=true));
 
   SI.Distance length
     "Distance between the origin of frame_a and the origin of frame_b";
-  parameter Boolean animate = true "Enable animation"
-                                                     annotation(Dialog(group="Animation"));
 protected
   SI.Position r0_b[3] = {d0[1], d0[2], 0} * noEvent(min(length_a, length));
-  MB.Visualizers.Advanced.Shape shape_a(
+  MB.Visualizers.Advanced.Shape cylinder_a(
     shapeType="cylinder",
     color=color_a,
     specularCoefficient=specularCoefficient,
@@ -56,8 +51,7 @@ protected
     widthDirection={0,0,1},
     r=MB.Frames.resolve1(planarWorld.R,{frame_a.x,frame_a.y,zPosition})+planarWorld.r_0,
     R=planarWorld.R) if planarWorld.enableAnimation and animate;
-
-  MB.Visualizers.Advanced.Shape shape_b(
+  MB.Visualizers.Advanced.Shape cylinder_b(
     shapeType="cylinder",
     color=color_b,
     specularCoefficient=specularCoefficient,
@@ -107,12 +101,13 @@ equation
   frame_a.fy + frame_b.fy = 0;
   frame_a.t + frame_b.t = 0;
 
+  lossPower = -f*v;
+
   annotation (
     Icon(graphics={
         Line(points={{-60,30},{60,30}}),
         Line(points={{-60,-30},{60,-30}}),
-        Line(points={{30,0},{100,0}}),
-        Line(points={{-101,0},{-60,0}}),
+        Line(points={{-100,0},{100,0}}),
         Rectangle(
           extent={{-60,30},{30,-30}},
           fillColor={192,192,192},
@@ -122,13 +117,24 @@ equation
           textString="%name",
           lineColor={0,0,255}),
         Text(
-          extent={{-108,-24},{-72,-49}},
-          lineColor={128,128,128},
-          textString="a"),
-        Text(
-          extent={{72,-24},{108,-49}},
-          lineColor={128,128,128},
-          textString="b")}),
+          extent={{-100,-50},{100,-80}},
+          lineColor={0,0,0},
+          textString="d=%d"),
+        Line(
+          visible=useHeatPort,
+          points={{-100,-100},{-100,-80},{-18,0}},
+          color={191,0,0},
+          pattern=LinePattern.Dot),
+        Ellipse(
+          extent={{-90,10},{-70,-10}},
+          lineColor={0,0,0},
+          fillColor={255,255,255},
+          fillPattern=FillPattern.Solid),
+        Ellipse(
+          extent={{70,10},{90,-10}},
+          lineColor={0,0,0},
+          fillColor={255,255,255},
+          fillPattern=FillPattern.Solid)}),
     Documentation(revisions="<html><p><img src=\"modelica://PlanarMechanics/Resources/Images/dlr_logo.png\"/> <b>Developed 2010-2014 at the DLR Institute of System Dynamics and Control</b></p></html>",  info="<html>
 <p>This component is a <b>linear damper</b>, which acts as a line force between frame_a and frame_b. A <b>force f</b> is exerted on the origin of frame_b and with opposite sign on the origin of frame_a along the line from the origin of frame_a to the origin of frame_b according to the equation: </p>
 <p><code>f = d*<b>der</b>(s);</code></p>

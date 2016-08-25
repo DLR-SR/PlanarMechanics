@@ -2,6 +2,10 @@ within PlanarMechanics.Joints;
 model DryFrictionBasedRolling
   "A joint representing a wheel with slip-based rolling (dry friction law) on the x-axis"
 
+    extends
+    Modelica.Thermal.HeatTransfer.Interfaces.PartialElementaryConditionalHeatPort(
+     final T=293.15);
+
   Interfaces.Frame_a frame_a
     annotation (Placement(transformation(extent={{-116,-16},{-84,16}})));
   outer PlanarWorld planarWorld "Planar world model";
@@ -85,6 +89,7 @@ equation
     v_slip));
   //balance forces
   frame_a.fx*R = frame_a.t;
+  lossPower = frame_a.fx*v_slip;
   annotation (Icon(graphics={
         Ellipse(
           extent={{-80,80},{80,-80}},
@@ -107,7 +112,12 @@ equation
         Text(
           extent={{-150,120},{150,80}},
           textString="%name",
-          lineColor={0,0,255})}),
+          lineColor={0,0,255}),
+        Line(
+          visible=useHeatPort,
+          points={{-100,-100},{-100,-80},{0,-80}},
+          color={191,0,0},
+          pattern=LinePattern.Dot)}),
     Documentation(
       revisions="<html><p><img src=\"modelica://PlanarMechanics/Resources/Images/dlr_logo.png\"/> <b>Developed 2010-2014 at the DLR Institute of System Dynamics and Control</b></p></html>",
       info="<html>

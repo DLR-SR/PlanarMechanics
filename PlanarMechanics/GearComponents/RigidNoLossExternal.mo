@@ -7,7 +7,7 @@ model RigidNoLossExternal "External rigid gear gonnection model"
   parameter SI.Distance r_b=1 "Radius of gear B";
 
   parameter Boolean animate = true "= true, if animation shall be enabled" annotation(Evaluate=true, HideResult=true);
-  parameter SI.Angle StartAngle_a = 0 "Start Angle of gear B" annotation ( HideResult=true,Dialog(
+  parameter SI.Angle StartAngle_a = 0 "Start Angle of gear A" annotation ( HideResult=true,Dialog(
      tab="Animation",
       group="if animation = true",
       enable=animate));
@@ -15,7 +15,15 @@ model RigidNoLossExternal "External rigid gear gonnection model"
       tab="Animation",
       group="if animation = true",
       enable=animate));
-  parameter Integer Tooth_a(min=1) = 20 "Number of teeth" annotation ( HideResult=true,Dialog(
+  parameter Integer Tooth_a(min=1) = 20 "Number of Tooth" annotation (Dialog(
+      HideResult=true,
+      tab="Animation",
+      group="if animation = true",
+      enable=animate));
+  final parameter Integer Tooth_b(min=1) = integer(
+    PlanarMechanics.Utilities.Functions.round(Tooth_a/r_a*r_b)) "Number of Tooth"
+       annotation (Dialog(
+      HideResult=true,
       tab="Animation",
       group="if animation = true",
       enable=animate));
@@ -47,16 +55,12 @@ model RigidNoLossExternal "External rigid gear gonnection model"
   SI.Acceleration a_mesh "Mesh acceleration";
   SI.Length xmesh_a "Mesh position of gear A";
   SI.Length xmesh_b "Mesh position of gear B";
-
-  SI.Angle phi_c_total
-    "Total angle of the gear moved (startangle is subtracted)";
-
   SI.Angle phi_gear "Gear angle";
 
 protected
-  SI.Angle phi_gear_zero "Previous gear angle";
-  Modelica.Blocks.Continuous.FirstOrder firstOrder(T=1e-4);
-  Integer Tooth_b(min=1) "Number of teeth";
+  SI.Angle phi_gear2=atan2(frame_b.y - frame_a.y, frame_b.x - frame_a.x)
+    "Temporary Gear angle";
+  Modelica.SIunits.AngularVelocity dphi_gear2 "Temporary Gear angle";
  //Visualization
 
   MB.Visualizers.Advanced.Shape pointA(
@@ -97,7 +101,7 @@ protected
     extra=Tooth_a,
     R=MB.Frames.absoluteRotation(planarWorld.R,MB.Frames.planarRotation(
         {0,0,1},
-        frame_a.phi - StartAngle_a,
+        frame_a.phi + (StartAngle_a - (mod(Tooth_a, 2))*2*Modelica.Constants.pi/Tooth_a/4),
         0))) if planarWorld.enableAnimation and animate;
 
   MB.Visualizers.Advanced.Shape Gearwheel_b(
@@ -114,38 +118,29 @@ protected
     extra=Tooth_b,
     R=MB.Frames.absoluteRotation(planarWorld.R,MB.Frames.planarRotation(
         {0,0,1},
-        frame_b.phi - StartAngle_b,
+        frame_b.phi + (StartAngle_b + (1 - mod(Tooth_b, 2))*2*Modelica.Constants.pi/Tooth_b/4),
         0))) if planarWorld.enableAnimation and animate;
 
   constant SI.Acceleration unitAcceleration=1;
   constant SI.Force unitForce=1;
-  parameter SI.Angle phi_c_start(fixed=false);
 initial equation
-  phi_c_start = phi_gear;
+  phi_gear = atan2(frame_b.y - frame_a.y, frame_b.x - frame_a.x);
 equation
+
+  w_gear = der(phi_gear);
+  dphi_gear2 = der(phi_gear2);
+  der(phi_gear) = dphi_gear2;
+
   lossPower = 0;
-
-  phi_gear_zero = firstOrder.y;
-  firstOrder.u = phi_gear;
-  phi_gear =PlanarMechanics.Utilities.Functions.atan3b(
-    frame_b.y - frame_a.y,
-    frame_b.x - frame_a.x,
-    (phi_gear_zero));
-
-  Tooth_b = integer(Tooth_a/r_a*r_b);
-// ********* General set up **************
-// set up the total traveled angle
-  phi_c_total = phi_gear - phi_c_start;
 
 // Derivatives
   w_a = der(frame_a.phi);
   w_b = der(frame_b.phi);
-  w_gear = der(phi_gear);
   a_mesh = der(v_mesh);
 
 //  ********** Mesh position & speed ***************
-  xmesh_a = frame_a.phi*r_a - phi_c_total*r_a;
-  xmesh_b = -frame_b.phi*r_b + phi_c_total*r_b;
+  xmesh_a = frame_a.phi*r_a - phi_gear*r_a;
+  xmesh_b = -frame_b.phi*r_b + phi_gear*r_b;
   xmesh_a - xmesh_b = 0;
   v_mesh = der(xmesh_a);
 
@@ -272,19 +267,30 @@ equation
           thickness=1),
         Line(
           points={{30,0},{100,0}},
-          thickness=1)}),    Documentation(revisions=
-          "<html><p><img src=\"modelica://PlanarMechanics/Resources/Images/dlr_logo.png\"/> <b>Developed 2010-2014 at the DLR Institute of System Dynamics and Control</b> </p></html>",
-                                                                                                    info="<html>
-<p>In this model an ideal gear connection is modelled. It is based on the paper from van der Linden , <a href=\"http://dx.doi.org/10.3384/ecp12076303\">Modelling of Elastic Gearboxes Using a Generalized Gear Contact Model</a>. However, no gear elasticity is modelled.</p>
-<p>The planar model of an external gear wheel is used to build complex gear models. A <a href=\"http://dx.doi.org/10.3384/ecp12076681\">planar library</a> is used to create the constraints of the gearwheels. An example can be found in <a href=\"modelica://Actuator.Mechanical.Planar.Examples.SpurGear\">here</a>.</p>
+          thickness=1)}),
+    Icon(
+        graphics={
+        Line(
+          visible=useHeatPort,
+          points={{-100,-100},{-100,-40},{-16,-40},{-16,0}},
+          color={191,0,0},
+          pattern=LinePattern.Dot)}),
+    Documentation(
+      revisions=
+"<html><p><img src=\"modelica://PlanarMechanics/Resources/Images/dlr_logo.png\"/> <b>Developed 2010-2014 at the DLR Institute of System Dynamics and Control</b> </p></html>",
+      info="<html>
+<p>In this model an ideal gear connection is modelled. It is based on the paper from van der Linden: <a href=\"http://dx.doi.org/10.3384/ecp12076303\">Modelling of Elastic Gearboxes Using a Generalized Gear Contact Model</a>. However, no gear elasticity is modelled.</p>
+<p>The planar model of an external gear wheel is used to build complex gear models. A <a href=\"http://dx.doi.org/10.3384/ecp12076681\">planar library</a> is used to create the constraints of the gearwheels. An example can be found in <a href=\"modelica://PlanarMechanics.GearComponents.Examples.SpurGear\">SpurGear</a>.</p>
 <p>Using different parts from the planar library, it is possible to build complex gear systems. However, especially since no elasticity is included, kinematic loops can lead to complications and should be handled with care.</p>
 <p>This model is suitable for: </p>
-<p>&middot;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Kinematic analysis of gear systems and gear-like systems.</p>
-<p>&middot;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Modelling of multiple gear stage models with clutches.</p>
-<p><b>Literature</b></p>
+<ul>
+<li>Kinematic analysis of gear systems and gear-like systems.</li>
+<li>Modelling of multiple gear stage models with clutches.</li>
+</ul>
+
+<h4>Literature</h4>
 <ol>
 <li>van der Linden, F., Modelling of Elastic Gearboxes Using a Generalized Gear Contact Model, <i>Proceedings of the 9th International MODELICA Conference, Linkoping University Electronic Press, </i><b>2012</b>, 303-310 </li>
 </ol>
-<p><br>The planar connectors are in progress of being standardized (work in progress at dlr).</p>
 </html>"));
 end RigidNoLossExternal;

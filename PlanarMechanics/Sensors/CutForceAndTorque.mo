@@ -21,10 +21,10 @@ model CutForceAndTorque "Measure cut force and cut torque vector"
     "= true, if animation shall be enabled (show force and torque arrow)";
   parameter Boolean positiveSign=true
     "= true, if force and torque with positive sign is returned (= frame_a.f/.t), otherwise with negative sign (= frame_b.f/.t)";
-  input Real N_to_m(unit="N/m") = 1000
+  input Real N_to_m(unit="N/m") = planarWorld.defaultN_to_m
     "Force arrow scaling (length = force/N_to_m)"
     annotation (Dialog(group="if animation = true", enable=animation));
-  input Real Nm_to_m(unit="N.m/m") = 1000
+  input Real Nm_to_m(unit="N.m/m") = planarWorld.defaultNm_to_m
     "Torque arrow scaling (length = torque/Nm_to_m)"
     annotation (Dialog(group="if animation = true", enable=animation));
   input SI.Diameter forceDiameter=planarWorld.defaultArrowDiameter
@@ -33,13 +33,13 @@ model CutForceAndTorque "Measure cut force and cut torque vector"
                                 annotation (Dialog(group="if animation = true", enable=animation));
   input Types.Color forceColor=Modelica.Mechanics.MultiBody.Types.Defaults.ForceColor
     "Color of force arrow"
-    annotation (Dialog(group="if animation = true", enable=animation));
+    annotation (HideResult=true, Dialog(colorSelector=true, group="if animation = true", enable=animation));
   input Types.Color torqueColor=Modelica.Mechanics.MultiBody.Types.Defaults.TorqueColor
     "Color of torque arrow"
-    annotation (Dialog(group="if animation = true", enable=animation));
-  input Modelica.Mechanics.MultiBody.Types.SpecularCoefficient specularCoefficient = planarWorld.defaultSpecularCoefficient
+    annotation (HideResult=true, Dialog(colorSelector=true, group="if animation = true", enable=animation));
+  input PlanarMechanics.Types.SpecularCoefficient specularCoefficient = planarWorld.defaultSpecularCoefficient
     "Reflection of ambient light (= 0: light is completely absorbed)"
-    annotation (Dialog(group="if animation = true", enable=animation));
+    annotation (HideResult=true, Dialog(group="if animation = true", enable=animation));
 
   extends Internal.PartialCutForceSensor;
 
@@ -162,6 +162,8 @@ respectively, acting at frame_b and
 with negative sign at frame_a.
 </p>
 
-<img src=\"modelica://Modelica/Resources/Images/MultiBody/Sensors/CutForceAndTorque.png\">
+<p>
+<img src=\"modelica://Modelica/Resources/Images/Mechanics/MultiBody/Sensors/CutForceAndTorque.png\">
+</p>
 </html>"));
 end CutForceAndTorque;

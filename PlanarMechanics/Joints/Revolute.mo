@@ -12,6 +12,12 @@ model Revolute "A revolute joint"
   Modelica.Mechanics.Rotational.Interfaces.Flange_a flange_a(phi = phi, tau = t) if useFlange annotation (
       Placement(transformation(extent={{-10,-110},{10,-90}})));
 
+  Modelica.Mechanics.Rotational.Interfaces.Flange_b support if useFlange
+    "1-dim. rotational flange of the drive support (assumed to be fixed in the world frame, NOT in the joint)"
+    annotation (Placement(transformation(extent={{-10,10},{10,-10}},
+          rotation=180,
+        origin={-60,-100})));
+
   parameter SI.Length zPosition = planarWorld.defaultZPosition
     "Position z of cylinder representing the joint axis" annotation (Dialog(
       tab="Animation",
@@ -25,11 +31,11 @@ model Revolute "A revolute joint"
     "Diameter of cylinder representing the joint axis"
     annotation (Dialog(tab="Animation",
       group="if animation = true", enable=animate));
-  input Modelica.Mechanics.MultiBody.Types.Color cylinderColor=Types.Defaults.JointColor
+  input PlanarMechanics.Types.Color cylinderColor=Types.Defaults.JointColor
     "Color of cylinder representing the joint axis"
     annotation (HideResult=true, Dialog(colorSelector=true,tab="Animation",
       group="if animation = true", enable=animate));
-  input Modelica.Mechanics.MultiBody.Types.SpecularCoefficient
+  input PlanarMechanics.Types.SpecularCoefficient
     specularCoefficient = planarWorld.defaultSpecularCoefficient
     "Reflection of ambient light (= 0: light is completely absorbed)"
     annotation (HideResult=true, Dialog(tab="Animation",
@@ -69,6 +75,13 @@ public
     R=MB.Frames.absoluteRotation(planarWorld.R,MB.Frames.planarRotation({0,0,1}, phi, w)),
     extra=extra) if planarWorld.enableAnimation and animate;
 
+protected
+  Modelica.Mechanics.Rotational.Components.Fixed fixed
+    "support flange is fixed to ground"
+    annotation (Placement(transformation(extent={{-10,-10},{10,10}},
+        rotation=180,
+        origin={-60,-80})));
+
 equation
   //Differential Equations
   w = der(phi);
@@ -86,6 +99,8 @@ equation
   frame_a.fy + frame_b.fy = 0;
   frame_a.t + frame_b.t = 0;
   frame_a.t = t;
+  connect(fixed.flange,support)  annotation (Line(
+      points={{-60,-80},{-60,-100}}));
   annotation (Icon(graphics={
         Text(
           extent={{-150,100},{150,60}},
@@ -116,7 +131,24 @@ equation
         Text(
           extent={{104,-22},{140,-47}},
           lineColor={128,128,128},
-          textString="b")}),             Documentation(revisions="<html><p><img src=\"modelica://PlanarMechanics/Resources/Images/dlr_logo.png\"/> <b>Developed 2010-2014 at the DLR Institute of System Dynamics and Control</b> </p></html>",  info="<html>
+          textString="b"),
+        Line(
+          visible=useFlange,
+          points={{-30,-80},{-50,-100}}),
+        Line(
+          visible=useFlange,
+          points={{-50,-80},{-70,-100}}),
+        Line(
+          visible=useFlange,
+          points={{-70,-80},{-90,-100}}),
+        Line(
+          visible=useFlange,
+          points={{-92,-100},{-30,-100}}),
+        Rectangle(extent={{-100,60},{-20,-62}}, lineColor={0,0,0}),
+        Rectangle(extent={{20,62},{100,-60}}, lineColor={0,0,0})}),
+    Documentation(
+      revisions="<html><p><img src=\"modelica://PlanarMechanics/Resources/Images/dlr_logo.png\"/> <b>Developed 2010-2014 at the DLR Institute of System Dynamics and Control</b> </p></html>",
+      info="<html>
 <p>Joint where frame_b rotates around axis n which is fixed in frame_a. The two frames coincide when the rotation angle &quot;phi = 0&quot;.</p>
 <p>By setting <b>useFlange</b> as true, the flange for a 1-dim. rotational input will be activated. In the &quot;Initialization&quot; block, angular position <b>phi</b>, angular velocity <b>w</b> as well as angular acceleration <b>z</b> can be initialized.</p>
 <p>It can be defined via parameter (in &quot;advanced&quot; tab) <b>stateSelect</b> that the relative distance &quot;s&quot; and its derivative shall be definitely used as states by setting stateSelect=StateSelect.always. </p>

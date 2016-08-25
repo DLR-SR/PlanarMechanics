@@ -1,5 +1,5 @@
 within PlanarMechanics.Sources;
-model QuadraticSpeedDependantForce
+model QuadraticSpeedDependentForce
   "External force and torque acting at frame_b, defined by 3 input signals and resolved in world frame"
 
   outer PlanarWorld planarWorld "Planar world model";
@@ -35,13 +35,13 @@ public
     "Diameter of force arrow" annotation (Dialog(tab="Animation",group="if animation = true", enable=animation));
   parameter SI.Length zPosition = planarWorld.defaultZPosition
     "Position z of cylinder representing the fixed translation" annotation (Dialog(
-      tab="Animation",group="if animation = true", enable=animate));
+      tab="Animation",group="if animation = true", enable=animation));
   input Types.Color color= PlanarMechanics.Types.Defaults.ForceColor
     "Color of arrow"
-    annotation (Dialog(tab="Animation",group="if animation = true",colorSelector=true,  enable=animation));
+    annotation (HideResult=true, Dialog(tab="Animation",group="if animation = true",colorSelector=true,  enable=animation));
   input Types.SpecularCoefficient specularCoefficient = planarWorld.defaultSpecularCoefficient
     "Reflection of ambient light (= 0: light is completely absorbed)"
-    annotation (Dialog(tab="Animation",group="if animation = true",enable=animation));
+    annotation (HideResult=true, Dialog(tab="Animation",group="if animation = true",enable=animation));
 
   SI.Force force[3] = worldForce.force;
 
@@ -75,8 +75,8 @@ public
         extent={{-10,-10},{10,10}},
         rotation=180,
         origin={-10,40})));
-  Modelica.Blocks.Math.MatrixGain scaleForces(K=[-F_nominal,0,0; 0,-F_nominal,0;
-        0,0,-tau_nominal])                   annotation (Placement(
+  Modelica.Blocks.Math.MatrixGain scaleForces(K=[F_nominal,0,0; 0,F_nominal,0;
+        0,0,tau_nominal])                    annotation (Placement(
         transformation(
         extent={{-10,-10},{10,10}},
         origin={-50,0})));
@@ -142,8 +142,7 @@ equation
           lineColor={128,128,128},
           textString="b")}),
     Documentation(revisions="<html><p><img src=\"modelica://PlanarMechanics/Resources/Images/dlr_logo.png\"/> <b>Developed 2010-2014 at the DLR Institute of System Dynamics and Control</b></p></html>",  info="<html>
-<p>Model of a force quadratic dependant on the velocity of the flange. The force can be resolved in a world frame, or a relative speed can be used by selecting resolve_frame to use the extra frame_resolve.</p>
+<p>Model of a force quadratic dependent on the velocity of the flange. The force can be resolved in a world frame, or a relative speed can be used by selecting resolve_frame to use the extra frame_resolve.</p>
 <p>This model is e.g. suitable to simulate aerodynamic drag forces.</p>
 </html>"));
-end QuadraticSpeedDependantForce;
-
+end QuadraticSpeedDependentForce;

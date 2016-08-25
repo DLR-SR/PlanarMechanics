@@ -8,6 +8,10 @@ model CraneCrabTo3D "A damped crane crab"
         extent={{-10,-10},{10,10}},
         rotation=270,
         origin={50,-60})));
+  Parts.Body body1(
+    m=1,
+    I=0.1)
+    annotation (Placement(transformation(extent={{60,20},{80,40}})));
   Parts.FixedTranslation fixedTranslation(r={0,-1}) annotation (
       Placement(transformation(
         extent={{-10,-10},{10,10}},
@@ -17,15 +21,13 @@ model CraneCrabTo3D "A damped crane crab"
         extent={{-10,10},{10,-10}},
         rotation=180,
         origin={-10,30})));
-  Parts.Body body1(
-    m=1,
-    I=0.1)
-    annotation (Placement(transformation(extent={{60,20},{80,40}})));
-  inner PlanarWorld planarWorld(
-    connectToMultiBody=true,
+  inner PlanarWorldIn3D planarWorld(
     inheritGravityFromMultiBody=true,
-    constantGravity={0,0})
-    annotation (Placement(transformation(extent={{-20,-20},{0,0}})));
+    constantGravity={0,0},
+    animateGravity=false,
+    enableAnimation=true,
+    connectToMultiBody=true)
+    annotation (Placement(transformation(extent={{0,-60},{20,-40}})));
   Joints.Revolute revolute(w(fixed=true), phi(fixed=true, start=2.6179938779915))
     annotation (Placement(transformation(
         extent={{-10,-10},{10,10}},
@@ -38,29 +40,25 @@ model CraneCrabTo3D "A damped crane crab"
     s(fixed=true, start=0),
     animate=true)
     annotation (Placement(transformation(extent={{20,40},{40,20}})));
-  Modelica.Mechanics.Translational.Components.Fixed fixed1D annotation (
-      Placement(transformation(
-        extent={{-10,-10},{10,10}},
-        rotation=270,
-        origin={-6,60})));
   Modelica.Mechanics.Translational.Components.Damper damper1D(d=10)
-    annotation (Placement(transformation(extent={{10,50},{30,70}})));
+    annotation (Placement(transformation(extent={{20,50},{40,70}})));
   inner MB.World world(n={0,-1,0})
-    annotation (Placement(transformation(extent={{-90,-80},{-70,-60}})));
-  MB.Joints.Prismatic prismatic1(
-    n={0,0,1},
+    annotation (Placement(transformation(extent={{-100,-60},{-80,-40}})));
+  MB.Joints.Prismatic prismatic3D(
     s(fixed=true, start=-0.2),
     useAxisFlange=false,
-    v(fixed=true, start=0.2)) annotation (Placement(transformation(
+    v(fixed=true, start=0.2),
+    n={1,0,0}) annotation (Placement(transformation(
+        extent={{-10,-10},{10,10}},
+        origin={-30,-50})));
+  MB.Parts.Body body3D(r_CM=zeros(3), m=1) annotation (Placement(transformation(
         extent={{-10,-10},{10,10}},
         rotation=90,
-        origin={-52,-26})));
-  MB.Parts.Body body2 annotation (Placement(transformation(
+        origin={-10,-20})));
+  MB.Parts.FixedRotation fixedRotation3D(n={0,1,0}, angle=45) annotation (
+      Placement(transformation(
         extent={{-10,-10},{10,10}},
-        rotation=90,
-        origin={-52,20})));
-  MB.Parts.FixedRotation fixedRotation(n={0,1,0}, angle=45)
-    annotation (Placement(transformation(extent={{-52,-78},{-32,-58}})));
+        origin={-60,-50})));
 equation
   connect(fixedTranslation.frame_b, body.frame_a) annotation (Line(
       points={{50,-40},{50,-50}},
@@ -82,30 +80,27 @@ equation
       points={{40,30},{60,30}},
       color={95,95,95},
       thickness=0.5));
-  connect(damper1D.flange_a, fixed1D.flange)
-    annotation (Line(points={{10,60},{-6,60}},   color={0,127,0}));
   connect(damper1D.flange_b, prismatic.flange_a)
-    annotation (Line(points={{30,60},{30,39}},   color={0,127,0}));
-  connect(body2.frame_a, prismatic1.frame_b) annotation (Line(
-      points={{-52,10},{-52,-16}},
+    annotation (Line(points={{40,60},{40,40},{30,40}},
+                                                 color={0,127,0}));
+  connect(body3D.frame_a, prismatic3D.frame_b) annotation (Line(
+      points={{-10,-30},{-10,-50},{-20,-50}},
       color={95,95,95},
-      thickness=0.5,
-      smooth=Smooth.None));
-  connect(planarWorld.MBFrame_a, prismatic1.frame_b) annotation (Line(
-      points={{-20.2,-10},{-52,-10},{-52,-16}},
+      thickness=0.5));
+  connect(planarWorld.MBFrame_a, prismatic3D.frame_b) annotation (Line(
+      points={{-0.2,-50},{-20,-50}},
       color={95,95,95},
-      thickness=0.5,
-      smooth=Smooth.None));
-  connect(fixedRotation.frame_a, world.frame_b) annotation (Line(
-      points={{-52,-68},{-60,-68},{-60,-70},{-70,-70}},
+      thickness=0.5));
+  connect(fixedRotation3D.frame_a, world.frame_b) annotation (Line(
+      points={{-70,-50},{-80,-50}},
       color={95,95,95},
-      thickness=0.5,
-      smooth=Smooth.None));
-  connect(fixedRotation.frame_b, prismatic1.frame_a) annotation (Line(
-      points={{-32,-68},{-18,-68},{-18,-36},{-52,-36}},
+      thickness=0.5));
+  connect(fixedRotation3D.frame_b, prismatic3D.frame_a) annotation (Line(
+      points={{-50,-50},{-40,-50}},
       color={95,95,95},
-      thickness=0.5,
-      smooth=Smooth.None));
+      thickness=0.5));
+  connect(damper1D.flange_a, prismatic.support) annotation (Line(points={{20,60},
+          {20,60},{20,40},{24,40}}, color={0,127,0}));
   annotation (experiment(StopTime=10),
     Documentation(revisions="<html><p><img src=\"modelica://PlanarMechanics/Resources/Images/dlr_logo.png\"/> <b>Developed 2010-2014 at the DLR Institute of System Dynamics and Control</b></p></html>",  info="<html>
 <p><img src=\"modelica://PlanarMechanics/Resources/Images/CraneCrab_1.png\"/></p>
@@ -117,7 +112,5 @@ equation
 <li>revolute.phi</li>
 <li>revolute.w</li>
 </ul>
-</html>"),
-    Diagram(coordinateSystem(preserveAspectRatio=false, extent={{-100,-100},{
-            100,100}}), graphics));
+</html>"));
 end CraneCrabTo3D;

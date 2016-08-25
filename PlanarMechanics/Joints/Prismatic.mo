@@ -10,12 +10,17 @@ model Prismatic "A prismatic joint"
     "Priority to use s and v as states" annotation(HideResult=true,Dialog(tab="Advanced"));
 
   parameter SI.Position r[2] "Direction of the rod wrt. body system at phi=0";
-  final parameter SI.Length l = sqrt(r*r) "Lengt of r";
+  final parameter SI.Length l = sqrt(r*r) "Length of r";
   final parameter SI.Distance e[2]= r/l "Normalized r";
 
   Modelica.Mechanics.Translational.Interfaces.Flange_a flange_a(f = f, s = s) if useFlange
    annotation (
-      Placement(transformation(extent={{-10,-100},{10,-80}})));
+      Placement(transformation(extent={{-10,-110},{10,-90}})));
+
+    Modelica.Mechanics.Translational.Interfaces.Flange_b support if useFlange
+    "1-dim. translational flange of the drive support (assumed to be fixed in the world frame, NOT in the joint)"
+    annotation (Placement(transformation(extent={{10,10},{-10,-10}}, rotation=180,
+        origin={-60,-100})));
 
   parameter SI.Length zPosition = planarWorld.defaultZPosition
     "Position z of the prismatic joint box" annotation (Dialog(
@@ -26,11 +31,11 @@ model Prismatic "A prismatic joint"
     "Width of prismatic joint box"
     annotation (Dialog(tab="Animation",
       group="if animation = true", enable=animate));
-  input Types.Color boxColor=Types.Defaults.JointColor
+  input PlanarMechanics.Types.Color boxColor=Types.Defaults.JointColor
     "Color of prismatic joint box"
     annotation (HideResult=true, Dialog(tab="Animation",
-      group="if animation = true", enable=animate));
-  input Modelica.Mechanics.MultiBody.Types.SpecularCoefficient
+      group="if animation = true", enable=animate, colorSelector=true));
+  input PlanarMechanics.Types.SpecularCoefficient
     specularCoefficient = planarWorld.defaultSpecularCoefficient
     "Reflection of ambient light (= 0: light is completely absorbed)"
     annotation (HideResult=true, Dialog(tab="Animation",
@@ -57,9 +62,16 @@ model Prismatic "A prismatic joint"
     height=boxWidth,
     lengthDirection={e0[1],e0[2],0},
     widthDirection={0,0,1},
-    r_shape={0,0,0},
-    r=MB.Frames.resolve1(planarWorld.R,{frame_a.x,frame_a.y,zPosition})+planarWorld.r_0,
+    r_shape={frame_a.x,frame_a.y,zPosition},
+    r=planarWorld.r_0,
     R=planarWorld.R) if planarWorld.enableAnimation and animate;
+
+protected
+  Modelica.Mechanics.Translational.Components.Fixed
+                                 fixed
+    annotation (Placement(transformation(extent={{-10,-10},{10,10}},
+        rotation=180,
+        origin={-60,-80})));
 
 equation
   //resolve the rod w.r.t. inertial system
@@ -83,22 +95,26 @@ equation
   frame_a.t  + frame_b.t + r0*{frame_b.fy,-frame_b.fx} = 0;
   {frame_a.fx,frame_a.fy}*e0 = f;
 
+  connect(fixed.flange,support)  annotation (Line(
+      points={{-60,-80},{-60,-100}},
+      color={0,127,0}));
   annotation (Icon(coordinateSystem(preserveAspectRatio=false, extent={{-100,-100},
             {100,100}}),
                    graphics={
         Rectangle(
           extent={{-100,40},{-20,-40}},
           lineColor={0,0,0},
-          fillPattern=FillPattern.HorizontalCylinder,
+          fillPattern=FillPattern.Solid,
           fillColor={175,175,175}),
         Rectangle(
           extent={{-20,-20},{100,20}},
           lineColor={0,0,0},
-          fillPattern=FillPattern.HorizontalCylinder,
+          fillPattern=FillPattern.Solid,
           fillColor={175,175,175}),
         Line(
           visible=useFlange,
-          points={{0,-90},{0,-20}}),
+          points={{0,-90},{0,-20}},
+          color={0,127,0}),
         Text(
           extent={{-140,-22},{-104,-47}},
           lineColor={128,128,128},
@@ -114,7 +130,19 @@ equation
         Text(
           extent={{-100,-50},{100,-80}},
           lineColor={0,0,0},
-          textString="r=%r")}),
+          textString="r=%r"),
+        Line(
+          visible=useFlange,
+          points={{-92,-100},{-30,-100}}),
+        Line(
+          visible=useFlange,
+          points={{-30,-80},{-50,-100}}),
+        Line(
+          visible=useFlange,
+          points={{-50,-80},{-70,-100}}),
+        Line(
+          visible=useFlange,
+          points={{-70,-80},{-90,-100}})}),
     Documentation(revisions="<html><p><img src=\"modelica://PlanarMechanics/Resources/Images/dlr_logo.png\"/> <b>Developed 2010-2014 at the DLR Institute of System Dynamics and Control</b> </p></html>",  info="<html>
 <p>Direction of the Joint is determined by <b>r[2]</b>, which is a vector pointing from <b>frame_a</b> to <b>frame_b</b>. </p>
 <p>By setting <b>useFlange</b> as true, the flange for a 1-dim. translational input will be activated. In the &quot;Initialization&quot; block, elongation of the joint <b>s</b>, velocity of elongation <b>v</b> as well as acceleration of elongation <b>a</b> can be initialized.</p>
