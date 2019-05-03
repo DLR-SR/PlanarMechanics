@@ -2,13 +2,15 @@ within PlanarMechanics.Interfaces;
 model PlanarToMultiBody
   "This model enables to connect planar models to 3D Models"
   parameter SI.Length zPosition = planarWorld.defaultZPosition
-    "Position z of cylinder representing the fixed translation" annotation (Dialog(
-      tab="Animation", group="if animation = true", enable=animate));
+    "Position z of cylinder representing the fixed translation";
+    //annotation (Dialog(tab="Animation", group="if animation = true", enable=animate));
+
   outer PlanarWorld planarWorld "planar world model";
   Frame_a frame_a "Frame connector in PlanarMechanics"
     annotation (Placement(transformation(extent={{-56,-16},{-24,16}})));
   MB.Interfaces.Frame_b frame_b "Frame connector in MultiBody"
     annotation (Placement(transformation(extent={{24,-16},{56,16}})));
+
 protected
   SI.Force fz "Normal Force";
   SI.Force f0[3] "Force vector";
@@ -50,7 +52,12 @@ equation
           lineColor={95,95,95},
           fillColor={95,95,95},
           fillPattern=FillPattern.Solid)}),
-                                 Documentation(revisions="<html><p><img src=\"modelica://PlanarMechanics/Resources/Images/dlr_logo.png\"/> <b>Developed 2010-2014 at the DLR Institute of System Dynamics and Control</b></p></html>",  info="<html>
+    Documentation(revisions="<html>
+<p>
+<img src=\"modelica://PlanarMechanics/Resources/Images/dlr_logo.png\" alt=\"DLR logo\">
+<b>Developed 2010-2019 at the DLR Institute of System Dynamics and Control</b>
+</p>
+</html>",  info="<html>
 <p>This component enables the connection between Planarmechanics and <a href=\"Modelica://Modelica.Mechanics.MultiBody\">MultiBody</a>.</p>
 <p>The orientation and position of the 2D system within the 3D system are determined by the Multi-Body connector of the planar world model or zero rotation at zero position otherwise</p>
 <p>The physical connection assumes the 2D world to be the root of the system, defining the orientation. All forces and torques acting outside the plane are assumed to be absorbed by the planar world system.. Beware! These forces are not transmitted by the Multi-Body connector of the planar world.</p>

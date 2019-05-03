@@ -7,7 +7,7 @@ model BasicCutForce
   import Modelica.Mechanics.MultiBody.Frames;
 
   extends Internal.PartialCutForceBaseSensor;
-  Modelica.Blocks.Interfaces.RealOutput force[2](final quantity="Force", final unit="N")
+  Modelica.Blocks.Interfaces.RealOutput force[2](each final quantity="Force", each final unit="N")
     "Cut force resolved in frame defined by resolveInFrame"
        annotation (Placement(transformation(
         origin={-80,-110},
@@ -37,7 +37,12 @@ equation
           extent={{-190,-70},{-74,-96}},
           textString="force"), Line(points={{-80,-100},{-80,0}}, color={0,0,
               127})}),
-    Documentation(revisions="<html><p><img src=\"modelica://PlanarMechanics/Resources/Images/dlr_logo.png\"/> <b>Developed 2010-2014 at the DLR Institute of System Dynamics and Control</b></p></html>",  info="<HTML>
+    Documentation(revisions="<html>
+<p>
+<img src=\"modelica://PlanarMechanics/Resources/Images/dlr_logo.png\" alt=\"DLR logo\">
+<b>Developed 2010-2019 at the DLR Institute of System Dynamics and Control</b>
+</p>
+</html>",  info="<HTML>
 
 </HTML>"));
 end BasicCutForce;

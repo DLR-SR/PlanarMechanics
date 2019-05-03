@@ -1,9 +1,8 @@
 within PlanarMechanics.Parts;
 model SpringDamper "Linear 2D translational spring damper model"
   extends BaseClasses.TwoConnectorShapes;
-    extends
-    Modelica.Thermal.HeatTransfer.Interfaces.PartialElementaryConditionalHeatPort(
-     final T=293.15);
+  extends Modelica.Thermal.HeatTransfer.Interfaces.PartialElementaryConditionalHeatPort(
+    final T=293.15);
 
   parameter StateSelect stateSelect=StateSelect.default
     "Priority to use phi, w and a as states" annotation(HideResult=true,Dialog(tab="Advanced"));
@@ -111,7 +110,7 @@ protected
 
 equation
   if enableAssert then
-     assert(noEvent(length > s_small), "
+    assert(noEvent(length > s_small), "
  The distance between the origin of frame_a and the origin of frame_b
  of a Spring component became smaller as parameter s_small
  (= a small number, defined in the \"Advanced\" menu). The distance is
@@ -128,8 +127,9 @@ equation
  - The flange_b connector might be defined by a pre-defined motion,
    e.g., with Modelica.Mechanics.Translational.Position and the
    predefined flange_b.s is zero or negative.
- ",level=  AssertionLevel.warning);
-   end if;
+",    level = AssertionLevel.warning);
+  end if;
+
   r_rel_0 = {s_relx, s_rely, 0};
   length = Modelica.Math.Vectors.length(r_rel_0);
   e_rel_0 = r_rel_0/MB.Frames.Internal.maxWithoutEvent(length, s_small);
@@ -153,7 +153,12 @@ equation
 
   lossPower = d_x*v_relx*v_relx + d_y*v_rely*v_rely;
   annotation (
-    Documentation(revisions="<html><p><img src=\"modelica://PlanarMechanics/Resources/Images/dlr_logo.png\"/> <b>Developed 2010-2014 at the DLR Institute of System Dynamics and Control</b></p></html>",  info="<html>
+    Documentation(revisions="<html>
+<p>
+<img src=\"modelica://PlanarMechanics/Resources/Images/dlr_logo.png\" alt=\"DLR logo\">
+<b>Developed 2010-2019 at the DLR Institute of System Dynamics and Control</b>
+</p>
+</html>",  info="<html>
 <p>A <i>linear translational spring-damper</i>. x- and y direction stiffness and damping can be parameterized.</p>
 </html>"),
     Icon(coordinateSystem(
@@ -161,15 +166,10 @@ equation
         extent={{-100,-100},{100,100}},
         grid={2,2}), graphics={
         Line(
-          points={{-80,40},{-58,40},{-43,10},{-13,70},{17,10},{47,70},{62,40},{
-              80,40}},
-          thickness=0.5),
-        Line(points={{-70,-106},{-70,-41}},
-                                         color={128,128,128}),
-        Line(points={{70,-106},{70,-41}},
-                                       color={128,128,128}),
-        Line(points={{-70,-100},{70,-100}},
-                                        color={128,128,128}),
+          points={{-80,40},{-58,40},{-43,10},{-13,70},{17,10},{47,70},{62,40},{80,40}}, color={0,0,0}),
+        Line(points={{-70,-106},{-70,-41}}, color={128,128,128}),
+        Line(points={{70,-106},{70,-41}}, color={128,128,128}),
+        Line(points={{-70,-100},{70,-100}}, color={128,128,128}),
         Polygon(
           points={{60,-97},{70,-100},{60,-103},{60,-97}},
           lineColor={128,128,128},
@@ -233,4 +233,3 @@ equation
         Line(points={{-100,0},{-80,0}}),
         Line(points={{100,0},{80,0}})}));
 end SpringDamper;
-

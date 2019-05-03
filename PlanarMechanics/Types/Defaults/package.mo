@@ -1,5 +1,5 @@
 within PlanarMechanics.Types;
-package Defaults "Default settings of the MultiBody library via constants"
+package Defaults "Default settings of the library via constants"
   extends Modelica.Icons.Package;
 
   // Color defaults
@@ -47,10 +47,15 @@ package Defaults "Default settings of the MultiBody library via constants"
 */
 
 
-  annotation (Documentation(revisions="<html><p><img src=\"modelica://PlanarMechanics/Resources/Images/dlr_logo.png\"/> <b>Developed 2010-2014 at the DLR Institute of System Dynamics and Control</b></p></html>",  info="<html>
+  annotation (Documentation(revisions="<html>
+<p>
+<img src=\"modelica://PlanarMechanics/Resources/Images/dlr_logo.png\" alt=\"DLR logo\">
+<b>Developed 2010-2019 at the DLR Institute of System Dynamics and Control</b>
+</p>
+</html>",  info="<html>
 <p>
 This package contains constants used as default setting
-in the PlanarMechanics library.
+in the library.
 </p>
 </html>"));
 end Defaults;

@@ -16,8 +16,7 @@ equation
   connect(flange_b,idealPlanetary. ring) annotation (Line(
       points={{0,-100},{0,-62},{0,-62}}));
   connect(idealPlanetary.carrier, flange_right) annotation (Line(
-      points={{4,-42},{4,0},{100,0}},
-      pattern=LinePattern.None));
+      points={{4,-42},{4,0},{100,0}}));
   connect(idealPlanetary.sun, flange_left) annotation (Line(
       points={{0,-42},{0,-42},{0,0},{-100,0}}));
   annotation (Icon(graphics={
@@ -88,7 +87,11 @@ equation
           lineColor={0,0,255})}),
     Documentation(info="<html>
 <p>The differential gear is a 1D-rotational component. It is a variant of a planetary gear and can be used to distribute the torque equally among the wheels on one axis.</p>
-</html>", revisions="<html>
-<p><img src=\"modelica://PlanarMechanics/Resources/Images/dlr_logo.png\"/> <b>Developed 2010-2014 at the DLR Institute of System Dynamics and Control</b></p>
+</html>",
+      revisions="<html>
+<p>
+<img src=\"modelica://PlanarMechanics/Resources/Images/dlr_logo.png\" alt=\"DLR logo\">
+<b>Developed 2010-2019 at the DLR Institute of System Dynamics and Control</b>
+</p>
 </html>"));
 end DifferentialGear;

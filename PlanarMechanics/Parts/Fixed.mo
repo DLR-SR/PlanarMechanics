@@ -25,10 +25,18 @@ equation
         Line(
           points={{0,-40},{80,-80}}),
         Text(
-          extent={{-150,120},{150,80}},
+          extent={{-150,-90},{150,-120}},
+          textString="r=%r"),
+        Text(
+          extent={{-150,130},{150,90}},
           textString="%name",
           lineColor={0,0,255})}),
-    Documentation(revisions="<html><p><img src=\"modelica://PlanarMechanics/Resources/Images/dlr_logo.png\"/> <b>Developed 2010-2014 at the DLR Institute of System Dynamics and Control</b></p></html>",  info="<html>
+    Documentation(revisions="<html>
+<p>
+<img src=\"modelica://PlanarMechanics/Resources/Images/dlr_logo.png\" alt=\"DLR logo\">
+<b>Developed 2010-2019 at the DLR Institute of System Dynamics and Control</b>
+</p>
+</html>",  info="<html>
 <p>This component defines the x, y-position and angle of the frame connectors, to which this component is attached to.</p>
 </html>"));
 end Fixed;

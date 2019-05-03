@@ -7,34 +7,29 @@ model RigidNoLossInternal "Internal rigid gear gonnection model"
   parameter SI.Distance r_b=1 "Radius of gear B";
 
   parameter Boolean animate = true "= true, if animation shall be enabled" annotation(Evaluate=true, HideResult=true);
-  parameter Integer Tooth_a(min=1) = 20 "Number of Tooth" annotation (Dialog(
+  parameter Integer Tooth_a(min=1) = 20 "Number of Tooth" annotation (
       HideResult=true,
-      tab="Animation",
-      group="if animation = true",
-      enable=animate));
+      Dialog(tab="Animation", group="If animation = true", enable=animate));
   final parameter Integer Tooth_b(min=1) = integer(
     PlanarMechanics.Utilities.Functions.round(Tooth_a/r_a*r_b)) "Number of Tooth"
-    annotation (Dialog(
-      HideResult=true,
-      tab="Animation",
-      group="if animation = true",
-      enable=animate));
+    annotation (HideResult=true,
+      Dialog(tab="Animation", group="If animation = true", enable=animate));
 
   parameter Real RGB_a[3]={195,0,0} "Color A (RGB values)" annotation ( HideResult=true,Dialog(
       colorSelector=true,
       tab="Animation",
-      group="if animation = true",
+      group="If animation = true",
       enable=animate));
 
   parameter Real RGB_b[3]={0,0,195} "Color B (RGB values)" annotation (HideResult=true,Dialog(
       colorSelector=true,
       tab="Animation",
-      group="if animation = true",
+      group="If animation = true",
       enable=animate));
 
   parameter SI.Distance z_offset=0 "Offset of z-distance for simulation" annotation ( HideResult=true,Dialog(
      tab="Animation",
-      group="if animation = true",
+      group="If animation = true",
       enable=animate));
 
   SI.AngularVelocity w_a "Angular speed of gear A";
@@ -267,8 +262,12 @@ equation
           color={191,0,0},
           pattern=LinePattern.Dot)}),
     Documentation(
-      revisions=
-"<html><p><img src=\"modelica://PlanarMechanics/Resources/Images/dlr_logo.png\"/> <b>Developed 2010-2014 at the DLR Institute of System Dynamics and Control</b> </p></html>",
+      revisions="<html>
+<p>
+<img src=\"modelica://PlanarMechanics/Resources/Images/dlr_logo.png\" alt=\"DLR logo\">
+<b>Developed 2010-2019 at the DLR Institute of System Dynamics and Control</b>
+</p>
+</html>",
       info="<html>
 <p>In this model an ideal gear connection is modelled. It is based on the paper from van der Linden , <a href=\"http://dx.doi.org/10.3384/ecp12076303\">Modelling of Elastic Gearboxes Using a Generalized Gear Contact Model</a>. However, no gear elasticity is modelled.</p>
 <p>The planar model of an internal gear wheel is used to build complex gear models. A <a href=\"http://dx.doi.org/10.3384/ecp12076681\">planar library</a> is used to create the constraints of the gearwheels. An example can be found in <a href=\"modelica://PlanarMechanics.GearComponents.Examples.SpurGear\">here</a>.</p>

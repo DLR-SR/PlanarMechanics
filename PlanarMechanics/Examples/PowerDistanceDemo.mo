@@ -21,7 +21,7 @@ model PowerDistanceDemo "Power and distance sensor demo"
     I=0.1)
     annotation (Placement(transformation(extent={{0,20},{20,40}})));
   inner PlanarWorld planarWorld
-    annotation (Placement(transformation(extent={{-80,-22},{-60,-2}})));
+    annotation (Placement(transformation(extent={{-80,-20},{-60,0}})));
   Parts.Damper damper(d=1)
     annotation (Placement(transformation(extent={{-40,40},{-20,60}})));
   Joints.Revolute revolute(w(fixed=true), phi(fixed=true, start=2.6179938779915))
@@ -86,6 +86,9 @@ equation
 <p>This example shows how to use sensors for power and distance. The crane crab is used as an example.</p>
 </html>",
         revisions="<html>
-<p><img src=\"modelica://PlanarMechanics/Resources/Images/dlr_logo.png\"/> <b>Developed 2010-2014 at the DLR Institute of System Dynamics and Control</b></p>
+<p>
+<img src=\"modelica://PlanarMechanics/Resources/Images/dlr_logo.png\" alt=\"DLR logo\">
+<b>Developed 2010-2019 at the DLR Institute of System Dynamics and Control</b>
+</p>
 </html>"));
 end PowerDistanceDemo;

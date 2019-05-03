@@ -1,8 +1,7 @@
 within PlanarMechanics.VehicleComponents.Wheels;
 model SlipBasedWheelJoint "Slip-Friction based wheel joint"
-  extends
-    Modelica.Thermal.HeatTransfer.Interfaces.PartialElementaryConditionalHeatPort(
-     final T=293.15);
+  extends Modelica.Thermal.HeatTransfer.Interfaces.PartialElementaryConditionalHeatPort(
+    final T=293.15);
   Interfaces.Frame_a frame_a annotation (Placement(transformation(extent={{-56,-16},
             {-24,16}})));
   Modelica.Mechanics.Rotational.Interfaces.Flange_a flange_a annotation (
@@ -29,19 +28,19 @@ model SlipBasedWheelJoint "Slip-Friction based wheel joint"
   final parameter Real e[2] =  r/l "Normalized direction";
   Real e0[2] "Normalized direction w.r.t inertial system";
   Real R[2,2] "Rotation Matrix";
-  SI.Angle phi_roll(stateSelect=stateSelect, start=0) "roll angle of the wheel"
-                                                                                 annotation(Dialog(group="Initialization", showStartAttribute=true));
+  SI.Angle phi_roll(stateSelect=stateSelect, start=0) "Roll angle of the wheel"
+    annotation(Dialog(group="Initialization", showStartAttribute=true));
   SI.AngularVelocity w_roll(final stateSelect=stateSelect, start=0)
     "Roll velocity of wheel" annotation(Dialog(group="Initialization", showStartAttribute=true));
   SI.Velocity v[2] "velocity";
   SI.Velocity v_lat(start=0) "Driving in lateral direction"
-                                   annotation(Dialog(group="Initialization", showStartAttribute=true));
+    annotation(Dialog(group="Initialization", showStartAttribute=true));
   SI.Velocity v_long( start=0) "Velocity in longitudinal direction"
-                                         annotation(Dialog(group="Initialization", showStartAttribute=true));
+    annotation(Dialog(group="Initialization", showStartAttribute=true));
   SI.Velocity v_slip_long(start=0) "Slip velocity in longitudinal direction"
-                                              annotation(Dialog(group="Initialization", showStartAttribute=true));
+    annotation(Dialog(group="Initialization", showStartAttribute=true));
   SI.Velocity v_slip_lat(start=0) "Slip velocity in lateral direction"
-                                         annotation(Dialog(group="Initialization", showStartAttribute=true));
+    annotation(Dialog(group="Initialization", showStartAttribute=true));
   SI.Velocity v_slip "Slip velocity";
   SI.Force f "Longitudinal force";
   SI.Force f_lat "Longitudinal force";
@@ -50,19 +49,19 @@ model SlipBasedWheelJoint "Slip-Friction based wheel joint"
   SI.Velocity vAdhesion "Adhesion velocity";
   SI.Velocity vSlide "Sliding velocity";
   parameter Boolean animate = true "= true, if animation shall be enabled"
-                                           annotation(Dialog(group="Animation"));
+    annotation(Dialog(group="Animation"));
   parameter SI.Length zPosition = planarWorld.defaultZPosition
     "Position z of the body" annotation (Dialog(
       tab="Animation",
       group="if animation = true",
       enable=animate));
   parameter SI.Length diameter = 0.1 "Diameter of the rims"
-                           annotation (Dialog(
+    annotation (Dialog(
       tab="Animation",
       group="if animation = true",
       enable=animate));
   parameter SI.Length width = diameter * 0.6 "Width of the wheel"
-                         annotation (Dialog(
+    annotation (Dialog(
       tab="Animation",
       group="if animation = true",
       enable=animate));
@@ -95,7 +94,7 @@ model SlipBasedWheelJoint "Slip-Friction based wheel joint"
     r_shape={0,0,-radius},
     r=MB.Frames.resolve1(planarWorld.R,{frame_a.x,frame_a.y,zPosition})+planarWorld.r_0,
     R=MB.Frames.absoluteRotation(planarWorld.R,MB.Frames.planarRotation({-e0[2],e0[1],0},flange_a.phi,0))) if
-         planarWorld.enableAnimation and animate;
+      planarWorld.enableAnimation and animate;
   MB.Visualizers.Advanced.Shape rim2(
     shapeType="cylinder",
     color={195,195,195},
@@ -108,7 +107,7 @@ model SlipBasedWheelJoint "Slip-Friction based wheel joint"
     r_shape={0,0,-radius},
     r=MB.Frames.resolve1(planarWorld.R,{frame_a.x,frame_a.y,zPosition})+planarWorld.r_0,
     R=MB.Frames.absoluteRotation(planarWorld.R,MB.Frames.planarRotation({-e0[2],e0[1],0},flange_a.phi+Modelica.Constants.pi/2,0))) if
-         planarWorld.enableAnimation and animate;
+      planarWorld.enableAnimation and animate;
 equation
   R = {{cos(frame_a.phi), -sin(frame_a.phi)}, {sin(frame_a.phi),cos(frame_a.phi)}};
   e0 = R*e;
@@ -169,23 +168,26 @@ equation
         Line(
           points={{-40,-100},{40,-100}},
           color={95,95,95}),
-        Line(
-          points={{-40,-60},{40,-60}},
-          color={95,95,95}),
         Rectangle(
           extent={{100,10},{40,-10}},
           fillPattern=FillPattern.HorizontalCylinder,
           fillColor={231,231,231}),
-        Text(
-          extent={{-150,140},{150,100}},
-          textString="%name",
-          lineColor={0,0,255}),
         Line(
           visible=useHeatPort,
           points={{-100,-100},{-100,-90},{-30,-90}},
           color={191,0,0},
           pattern=LinePattern.Dot,
-          smooth=Smooth.None)}),   Documentation(info="<html>
+          smooth=Smooth.None),
+        Text(
+          extent={{-150,-40},{150,-70}},
+          lineColor={0,0,0},
+          textString="radius=%radius"),
+        Text(
+          extent={{-150,140},{150,100}},
+          textString="%name",
+          lineColor={0,0,255})}),
+    Documentation(
+      info="<html>
 <p>The ideal wheel joint models the behavior of a wheel rolling on a x,y-plane whose contact patch has slip-dependent friction characteristics. This is an approximation for wheels with a rim and a rupper tire.</p>
 <p>The force depends with friction characteristics on the <b>slip</b>. The <b>slip</b> is split into two components:</p>
 <ul>
@@ -197,8 +199,11 @@ equation
 <p>The wheel contains a 2D connector <b>frame_a</b> for the steering on the plane. The rolling motion of the wheel can be actuated by the 1D  connector <b>flange_a</b>.</p>
 <p>In addition there is an input for a dynamic component of the normal load.</p>
 <p>For examples of usage see the local <a href=\"modelica://PlanarMechanics.VehicleComponents.Examples\">Examples package</a>.</p>
-</html>", revisions="<html>
-<p><img src=\"modelica://PlanarMechanics/Resources/Images/dlr_logo.png\"/> <b>Developed 2010-2014 at the DLR Institute of System Dynamics and Control</b></p>
+</html>",
+      revisions="<html>
+<p>
+<img src=\"modelica://PlanarMechanics/Resources/Images/dlr_logo.png\" alt=\"DLR logo\">
+<b>Developed 2010-2019 at the DLR Institute of System Dynamics and Control</b>
+</p>
 </html>"));
 end SlipBasedWheelJoint;
-
